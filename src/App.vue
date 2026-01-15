@@ -1,7 +1,8 @@
 <script setup>
     import { ref, computed, onMounted } from 'vue'
     import { 
-        Trophy, RotateCcw, Save, Trash2, History, X, User, Activity 
+        Trophy, RotateCcw, Save, Trash2, History, X, 
+        User, ArrowRight, ArrowLeft, Activity 
     } from 'lucide-vue-next'
     
     // --- DATALÄHTEET ---
@@ -33,19 +34,27 @@
     ]
     
     // --- TILA (STATE) ---
-    const accuracy = ref(4.0)
-    const presentation = ref(6.0)
+    const scoringStep = ref(1) // 1 = Live (Accuracy), 2 = Post (Presentation)
+    const activeTab = ref('scoring')
     
+    const accuracy = ref(4.0)
     const actionStack = ref([]) // "Smart Undo" historia
+    
+    const speedPower = ref(2.0)
+    const rhythmTempo = ref(2.0)
+    const expressionEnergy = ref(2.0)
+    
     const athleteName = ref('')
     const selectedPoomsae = ref('')
     const showSaveModal = ref(false)
-    const activeTab = ref('scoring') 
     const history = ref([])
     
     // --- LOGIIKKA ---
+    const presentationScore = computed(() => {
+        return (parseFloat(speedPower.value) + parseFloat(rhythmTempo.value) + parseFloat(expressionEnergy.value))
+    })
     
-    const totalScore = computed(() => (accuracy.value + presentation.value).toFixed(1))
+    const totalScore = computed(() => (accuracy.value + presentationScore.value).toFixed(1))
     
     onMounted(() => {
         const saved = localStorage.getItem('poomsae_history')
@@ -53,68 +62,55 @@
     })
     
     // Pisteiden vähennys
-    const deductScore = (category, amount) => {
-        const currentVal = category === 'acc' ? accuracy.value : presentation.value
-        
-        // Lasketaan teoreettinen uusi arvo
-        let newVal = currentVal + amount
+    const deductScore = (amount) => {
+        // Accuracy logic
+        let newVal = accuracy.value + amount
         let actualDeduction = amount
         
-        // Jos menisi alle nollan, leikataan nollaan
         if (newVal < 0) {
             newVal = 0
-            // TÄRKEÄÄ: Jos pisteitä oli 0.2 ja vähennys oli -0.3,
-            // todellinen vähennys oli vain -0.2. Tämä pitää tallentaa
-            // pinoon, jotta Undo palauttaa oikean määrän.
-            actualDeduction = -currentVal
+            actualDeduction = -accuracy.value 
         }
         
-        // Tallennetaan pinoon se määrä, mikä OIKEASTI vähennettiin
-        actionStack.value.push({ category, amount: actualDeduction })
-        
-        // Päivitetään tila pyöristettynä yhteen desimaaliin
-        if (category === 'acc') {
-            accuracy.value = Math.round(newVal * 10) / 10
-        } else {
-            presentation.value = Math.round(newVal * 10) / 10
-        }
+        actionStack.value.push(actualDeduction) // Tallennetaan vain määrä, koska kohde on aina Acc
+        accuracy.value = Math.round(newVal * 10) / 10
     }
     
-    // Älykäs kumoaminen (Undo)
-    const undoLastAction = (category) => {
-        // Etsitään pinosta viimeisin toiminto, joka kohdistui tähän kategoriaan
-        // Tehdään haku lopusta alkuun
-        const index = actionStack.value.findLastIndex(action => action.category === category)
-        
-        if (index !== -1) {
-            const action = actionStack.value[index]
-            
-            // Palautetaan pisteet (vähennys oli negatiivinen, joten vähennyksen vähennys on plussaa)
-            if (category === 'acc') {
-                const newVal = accuracy.value - action.amount 
-                if (newVal <= 4.0) accuracy.value = Math.round(newVal * 10) / 10
-            } else {
-                const newVal = presentation.value - action.amount
-                if (newVal <= 6.0) presentation.value = Math.round(newVal * 10) / 10
-            }
-            
-            // Poistetaan toiminto pinosta
-            actionStack.value.splice(index, 1)
+    const undoLastAction = () => {
+        const lastDeduction = actionStack.value.pop()
+        if (lastDeduction !== undefined) {
+            const newVal = accuracy.value - lastDeduction
+            if (newVal <= 4.0) accuracy.value = Math.round(newVal * 10) / 10
         }
     }
     
     const resetScore = () => {
-        if (confirm('Haluatko varmasti nollata pisteet ja aloittaa alusta?')) {
+        if (confirm('Haluatko varmasti nollata kaiken?')) {
+            scoringStep.value = 1
             accuracy.value = 4.0
-            presentation.value = 6.0
-            actionStack.value = [] // Tyhjennetään undo-historia
+            actionStack.value = []
+            // Reset presentation defaults
+            speedPower.value = 2.0
+            rhythmTempo.value = 2.0
+            expressionEnergy.value = 2.0
         }
     }
+    
+    // --- NAVIGAATIO VAIHEIDEN VÄLILLÄ ---
+    
+    const goToPresentation = () => {
+        scoringStep.value = 2
+    }
+    
+    const backToLive = () => {
+        scoringStep.value = 1
+    }
+    
+    // --- TALLENNUS ---
     
     const savePerformance = () => {
         if (!athleteName.value.trim()) return
         
-        // Etsitään poomsaen tyyppi värikoodausta varten
         const poomsaeData = POOMSAE_DATA.find(p => p.name === selectedPoomsae.value)
         const poomsaeType = poomsaeData ? poomsaeData.type : 'unknown'
         
@@ -124,21 +120,34 @@
             name: athleteName.value,
             poomsae: selectedPoomsae.value || 'Ei määritelty',
             poomsaeType: poomsaeType,
+            // Tallennetaan kaikki osatekijät
             accuracy: accuracy.value.toFixed(1),
-            presentation: presentation.value.toFixed(1),
+            presentation: presentationScore.value.toFixed(1),
+            details: {
+                speed: parseFloat(speedPower.value).toFixed(1),
+                rhythm: parseFloat(rhythmTempo.value).toFixed(1),
+                energy: parseFloat(expressionEnergy.value).toFixed(1)
+            },
             total: totalScore.value
         }
         
         history.value.unshift(newRecord)
         localStorage.setItem('poomsae_history', JSON.stringify(history.value))
         
-        // Resetoidaan tilanne tallennuksen jälkeen
+        // Reset
         showSaveModal.value = false
+        resetAfterSave()
+    }
+    
+    const resetAfterSave = () => {
         athleteName.value = ''
         selectedPoomsae.value = ''
+        scoringStep.value = 1
         accuracy.value = 4.0
-        presentation.value = 6.0
         actionStack.value = []
+        speedPower.value = 2.0
+        rhythmTempo.value = 2.0
+        expressionEnergy.value = 2.0
     }
     
     const deleteRecord = (id) => {
@@ -187,56 +196,104 @@
             </div>
     
             <div v-if="activeTab === 'scoring'" class="space-y-4 animate-fade-in">
-                
-                <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-100">
-                    <div class="flex justify-between items-end mb-1">
-                        <h2 class="font-bold text-slate-500 text-sm uppercase">Tarkkuus (4.0)</h2>
-                        <span class="text-2xl font-black text-blue-600">{{ accuracy.toFixed(1) }}</span>
+
+                <!-- Scoring Step -->
+                <div v-if="scoringStep === 1" class="flex-1 flex flex-col gap-3 animate-fade-in">
+          
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col flex-1 relative">
+                        <div class="absolute top-3 left-3 bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-1 rounded">VAIHE 1/2</div>
+             
+                        <div class="flex flex-col items-center justify-center flex-1 mt-4">
+                            <h2 class="font-bold text-slate-400 text-sm uppercase tracking-widest mb-1">Accuracy</h2>
+                            <span class="text-4xl font-black text-slate-800 tracking-tighter">{{ accuracy.toFixed(1) }}</span>
+                            <span class="text-xs text-slate-400 mt-2 font-medium">Lähtöpisteet 4.0</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 h-32 mt-4">
+                            <button @click="deductScore(-0.1)" class="h-full bg-red-50 text-red-600 border border-red-100 rounded-xl font-black text-2xl active:scale-95 transition-transform hover:bg-red-100 touch-manipulation shadow-sm">
+                                -0.1
+                            </button>
+                            <button @click="deductScore(-0.3)" class="h-full bg-red-50 text-red-600 border border-red-100 rounded-xl font-black text-2xl active:scale-95 transition-transform hover:bg-red-100 touch-manipulation shadow-sm">
+                                -0.3
+                            </button>
+                        </div>
+             
+                        <div class="mt-3 flex justify-center">
+                            <button @click="undoLastAction" class="text-xs text-slate-400 flex items-center gap-1 hover:text-blue-600 py-2 px-4 rounded-full bg-slate-50">
+                                <RotateCcw :size="12" /> Peruuta viimeisin
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <button @click="deductScore('acc', -0.1)" class="h-16 bg-red-50 text-red-600 border border-red-100 rounded-xl font-bold text-xl active:scale-95 transition-transform hover:bg-red-100">
-                            -0.1
-                        </button>
-                        <button @click="deductScore('acc', -0.3)" class="h-16 bg-red-50 text-red-600 border border-red-100 rounded-xl font-bold text-xl active:scale-95 transition-transform hover:bg-red-100">
-                            -0.3
-                        </button>
-                    </div>
-                    <div class="mt-2 flex justify-end">
-                        <button @click="undoLastAction('acc')" class="text-xs text-slate-400 flex items-center gap-1 hover:text-blue-600 pt-2 px-2 active:text-blue-800">
-                            <RotateCcw :size="12" /> Peruuta viimeisin
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-100">
-                    <div class="flex justify-between items-end mb-1">
-                        <h2 class="font-bold text-slate-500 text-sm uppercase">Esitys (6.0)</h2>
-                        <span class="text-2xl font-black text-blue-600">{{ presentation.toFixed(1) }}</span>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <button @click="deductScore('pres', -0.1)" class="h-16 bg-red-50 text-red-600 border border-red-100 rounded-xl font-bold text-xl active:scale-95 transition-transform hover:bg-red-100">
-                            -0.1
-                        </button>
-                        <button @click="deductScore('pres', -0.3)" class="h-16 bg-red-50 text-red-600 border border-red-100 rounded-xl font-bold text-xl active:scale-95 transition-transform hover:bg-red-100">
-                            -0.3
-                        </button>
-                    </div>
-                    <div class="mt-2 flex justify-end">
-                        <button @click="undoLastAction('pres')" class="text-xs text-slate-400 flex items-center gap-1 hover:text-blue-600 pt-2 px-2 active:text-blue-800">
-                            <RotateCcw :size="12" /> Peruuta viimeisin
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4 pt-2">
-                    <button @click="resetScore" class="h-14 rounded-xl font-bold text-slate-600 bg-slate-200 hover:bg-slate-300 active:scale-95 transition-transform flex items-center justify-center gap-2">
-                        <RotateCcw :size="18" /> Nollaa
+
+                    <button @click="goToPresentation" class="h-16 bg-blue-600 text-white rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                        Suoritus päättyi <ArrowRight :size="20" />
                     </button>
-                    <button @click="showSaveModal = true" class="h-14 rounded-xl font-bold text-white bg-green-600 hover:bg-green-700 shadow-lg shadow-green-200 active:scale-95 transition-transform flex items-center justify-center gap-2">
-                        <Save :size="18" /> Tallenna
-                    </button>
+                </div>
+
+                <!-- Presentation Step -->
+                <div v-else class="flex-1 flex flex-col gap-4 animate-fade-in">
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex-1 flex flex-col justify-between">
+                        <div class="flex justify-between items-center mb-2">
+                            <button @click="backToLive" class="text-xs font-bold text-slate-400 flex items-center gap-1"><ArrowLeft :size="12"/> Palaa</button>
+                            <div class="bg-green-100 text-green-800 text-[10px] font-bold px-2 py-1 rounded">VAIHE 2/2</div>
+                        </div>
+
+                        <div class="text-center mb-1">
+                            <h2 class="font-bold text-slate-500 text-xs uppercase tracking-widest">Presentation</h2>
+                            <div class="text-4xl font-black text-blue-600">{{ presentationScore.toFixed(1) }}</div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <label class="text-xs font-bold text-slate-700 uppercase">Speed & Power</label>
+                                    <span class="text-sm font-black text-slate-900">{{ parseFloat(speedPower).toFixed(1) }}</span>
+                                </div>
+                                <input 
+                                    type="range" min="0" max="2.0" step="0.1" 
+                                    v-model="speedPower"
+                                    class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                    >
+                                <div class="flex justify-between text-[10px] text-slate-400 mt-1"><span>0.0</span><span>2.0</span></div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <label class="text-xs font-bold text-slate-700 uppercase">Rhythm & Tempo</label>
+                                    <span class="text-sm font-black text-slate-900">{{ parseFloat(rhythmTempo).toFixed(1) }}</span>
+                                </div>
+                                <input 
+                                    type="range" min="0" max="2.0" step="0.1" 
+                                    v-model="rhythmTempo"
+                                    class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                    >
+                                <div class="flex justify-between text-[10px] text-slate-400 mt-1"><span>0.0</span><span>2.0</span></div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <label class="text-xs font-bold text-slate-700 uppercase">Expression of Energy</label>
+                                    <span class="text-sm font-black text-slate-900">{{ parseFloat(expressionEnergy).toFixed(1) }}</span>
+                                </div>
+                                <input 
+                                    type="range" min="0" max="2.0" step="0.1" 
+                                    v-model="expressionEnergy"
+                                    class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                    >
+                                <div class="flex justify-between text-[10px] text-slate-400 mt-1"><span>0.0</span><span>2.0</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 h-14 flex-none">
+                        <button @click="resetScore" class="bg-slate-200 text-slate-600 rounded-xl font-bold text-sm flex items-center justify-center gap-2">
+                            <RotateCcw :size="16" /> Nollaa
+                        </button>
+                        <button @click="showSaveModal = true" class="bg-green-600 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg">
+                            <Save :size="16" /> Tallenna
+                        </button>
+                    </div>
+
                 </div>
             </div>
             
@@ -261,8 +318,8 @@
                     </div>
                     
                     <div class="text-xs text-slate-500 bg-slate-50 inline-block px-2 py-1 rounded">
-                        Acc: <b>{{ item.accuracy }}</b> / Pres: <b>{{ item.presentation }}</b>
-                        <span class="ml-2 text-slate-300">|</span> <span class="ml-1 text-slate-400">{{ item.date }}</span>
+                        Acc: <b>{{ item.accuracy }}</b> / Pres: <b>{{ item.presentation }}</b><br/>S&P: {{ item.details.speed }}, R&T: {{ item.details.rhythm }}, EoE: {{ item.details.energy }}
+                        <span class=" text-slate-300">|</span> <span class="text-slate-400">{{ item.date }}</span>
                     </div>
                 </div>
                 <div class="flex flex-col items-end gap-2 pl-2">
