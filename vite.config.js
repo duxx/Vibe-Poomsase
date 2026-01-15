@@ -9,9 +9,9 @@ export default defineConfig({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
             manifest: {
-                name: 'WT Poomsae Scorer',
+                name: 'WT Poomsae',
                 short_name: 'Poomsae',
-                description: 'Taekwondo Poomsae pisteytys',
+                description: 'WT Taekwondo Poomsae pisteytys',
                 theme_color: '#ffffff',
                 background_color: '#ffffff',
                 display: 'standalone',

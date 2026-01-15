@@ -1,5 +1,79 @@
-# Vue 3 + Vite
+# WT Poomsae Scorer
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Moderni ja helppokäyttöinen PWA-sovellus (Progressive Web App) Taekwondo Poomsae -suoritusten pisteytykseen WT-säännöillä (World Taekwondo). Sovellus on suunniteltu erityisesti seuran sisäiseen harjoituskäyttöön ja tuomariharjoitteluun.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## 📱 Kuvakaappaukset
+
+| Pisteytys | Tallennus | Historia |
+|:---:|:---:|:---:|
+| ![Pisteytysnäkymä](./screenshots/main.png) | ![Tallennus ja liikesarja](./screenshots/save_score.png) | ![Suoritushistoria](./screenshots/score_history.png) |
+*Sovelluksen päänäkymät: Pisteytys, Suorituksen tallennus ja Historia.*
+
+## ✨ Ominaisuudet
+
+- **Virallinen pisteytys:** Accuracy (4.0) ja Presentation (6.0) lähtöpisteet.
+- **Isot painikkeet:** Helppo käyttää katsomatta näyttöön (-0.1 ja -0.3 vähennykset).
+- **Älykäs kumoaminen (Undo):** Mahdollisuus perua viimeisin vähennys virhepainalluksen sattuessa.
+- **Liikesarjojen tuki:** Valitse suoritettava liikesarja (Gi Chu, Taegeuk 1-8, Mustien vöiden sarjat).
+- **Historia:** Tallentaa suoritukset laitteen muistiin (LocalStorage).
+- **Offline-tila:** Toimii ilman verkkoyhteyttä asennuksen jälkeen.
+
+## 🚀 Asennus puhelimeen (PWA)
+
+Sovellus toimii suoraan selaimessa, mutta parhaan käyttökokemuksen saat asentamalla sen kotivalikkoon, jolloin se toimii kuin natiivisovellus.
+
+### iOS (iPhone / iPad)
+1. Avaa sovellus **Safari**-selaimella.
+2. Paina **Jaa-painiketta** (nuoli laatikosta ylöspäin) alavalikossa.
+3. Valitse listasta **"Lisää Koti-valikkoon"** (Add to Home Screen).
+4. Paina yläkulmasta **Lisää**.
+
+### Android (Chrome)
+1. Avaa sovellus **Chrome**-selaimella.
+2. Jos selain ei ehdota asennusta automaattisesti, paina oikean yläkulman kolmea pistettä (**Menu**).
+3. Valitse **"Asenna sovellus"** tai **"Lisää aloitusnäyttöön"**.
+
+---
+
+## 🛠️ Käyttöohje
+
+1. **Aloitus:** Pisteet ovat oletuksena täydet (4.0 / 6.0).
+2. **Pisteytys:** Seuraa suoritusta ja paina vähennyspainikkeita virheiden mukaan.
+   - Pienet virheet: **-0.1**
+   - Isot virheet: **-0.3**
+3. **Korjaus:** Jos painat väärin, paina kyseisen osion **Peruuta**-nappia palauttaaksesi pisteet.
+4. **Tallennus:** Suorituksen lopuksi paina **Tallenna**.
+   - Syötä kilpailijan nimi.
+   - Valitse tai kirjoita liikesarja (esim. "Taegeuk 4").
+5. **Nollaus:** Voit aloittaa alusta tallentamatta painamalla **Nollaa**.
+6. **Historia:** Näet aiemmat suoritukset Historia-välilehdellä. Voit poistaa virheellisiä tallennuksia roskakori-ikonista.
+
+---
+
+## 💻 Kehitys ja asennus (Developers)
+
+Tämä projekti käyttää Vue 3:a ja Tailwind CSS:ää ilman raskaita komponenttikirjastoja.
+
+### Esivaatimukset
+- Node.js asennettuna
+
+### Asennus
+```bash
+# 1. Kloonaa repo
+git clone https://github.com/duxx/Vibe-Poomsase.git
+
+# 2. Asenna riippuvuudet
+npm install
+```
+
+### Dev (kehitysversio)
+```bash
+# Käynnistä kehityspalvelin
+npm run dev
+```
+
+### Build (tuotantoversio)
+```bash
+npm run build
+# Valmis sovellus löytyy /dist kansiosta
+```
