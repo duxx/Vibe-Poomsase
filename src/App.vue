@@ -318,7 +318,7 @@
                     </div>
                     
                     <div class="text-xs text-slate-500 bg-slate-50 inline-block px-2 py-1 rounded">
-                        Acc: <b>{{ item.accuracy }}</b> / Pres: <b>{{ item.presentation }}</b><br/>S&P: {{ item.details.speed }}, R&T: {{ item.details.rhythm }}, EoE: {{ item.details.energy }}
+                        Acc: <b>{{ item.accuracy }}</b> / Pres: <b>{{ item.presentation }}</b><br/>S&P: {{ item.details?.speed ?? '-' }}, R&T: {{ item.details?.rhythm ?? '-' }}, EoE: {{ item.details?.energy ?? '-' }}
                         <span class=" text-slate-300">|</span> <span class="text-slate-400">{{ item.date }}</span>
                     </div>
                 </div>
