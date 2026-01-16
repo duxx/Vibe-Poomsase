@@ -4,10 +4,11 @@ Moderni ja helppokäyttöinen PWA-sovellus (Progressive Web App) Taekwondo Pooms
 
 ## 📱 Kuvakaappaukset
 
-| Tarkkuus | Presentaatio | Tallennus | Historia |
-|:---:|:---:|:---:|:---:|
-| ![Pisteytysnäkymä 1](./screenshots/main.png) | ![Pisteytysnäkymä 2](./screenshots/presentation.png) | ![Tallennus ja liikesarja](./screenshots/save_score.png) | ![Suoritushistoria](./screenshots/score_history.png) |
-*Sovelluksen päänäkymät: Pisteytys tarkkuus, pisteytys presentaatio, Suorituksen tallennus ja Historia.*
+| Tarkkuus | Presentaatio | Tallennus | Historia | Kehittyminen |
+|:---:|:---:|:---:|:---:|:---:|
+| ![Pisteytysnäkymä 1](./screenshots/main.png) | ![Pisteytysnäkymä 2](./screenshots/presentation.png) | ![Tallennus ja liikesarja](./screenshots/save_score.png) | ![Suoritushistoria](./screenshots/score_history.png) | ![Kehittyminen](./screenshots/development.png) |
+
+*Sovelluksen päänäkymät: Pisteytys tarkkuus, pisteytys presentaatio, Suorituksen tallennus, Historia ja Kehittyminen.*
 
 ## ✨ Ominaisuudet
 
@@ -17,6 +18,7 @@ Moderni ja helppokäyttöinen PWA-sovellus (Progressive Web App) Taekwondo Pooms
 - **Älykäs kumoaminen (Undo):** Mahdollisuus perua viimeisin vähennys virhepainalluksen sattuessa.
 - **Liikesarjojen tuki:** Valitse suoritettava liikesarja (Gi Chu, Taegeuk 1-8, Mustien vöiden sarjat).
 - **Historia:** Tallentaa suoritukset laitteen muistiin (LocalStorage).
+- **Kehittymisen seuranta:** Visuaalinen graafi, jolla voi seurata kilpailijan kehitystä (Accuracy, Speed, Rhythm, Energy) eri liikesarjoissa.
 - **Offline-tila:** Toimii ilman verkkoyhteyttä asennuksen jälkeen.
 
 ## 🚀 Asennus puhelimeen (PWA)
@@ -49,6 +51,7 @@ Sovellus toimii suoraan selaimessa, mutta parhaan käyttökokemuksen saat asenta
    - Valitse tai kirjoita liikesarja (esim. "Taegeuk 4").
 5. **Nollaus:** Voit aloittaa alusta tallentamatta painamalla **Nollaa**. Tämä nollaa sekä presentaation, että tarkkuuden pisteet.
 6. **Historia:** Näet aiemmat suoritukset Historia-välilehdellä. Voit poistaa virheellisiä tallennuksia roskakori-ikonista.
+7. **Kehittyminen:** Valitse "Kehittyminen"-välilehti, syötä kilpailijan nimi ja liikesarja nähdäksesi graafin kehityksestä (Accuracy, Speed, Rhythm, Energy).
 
 ---
 

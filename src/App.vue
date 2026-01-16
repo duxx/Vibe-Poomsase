@@ -1,11 +1,12 @@
 <script setup>
     import { ref, computed, onMounted } from 'vue'
     import { 
-        Trophy, RotateCcw, Save, Trash2, History, X, 
+        RotateCcw, Save, Trash2, History, X, 
         User, ArrowRight, ArrowLeft, Activity 
     } from 'lucide-vue-next'
     
     // --- DATALÄHTEET ---
+    import DevelopmentChart from './components/DevelopmentChart.vue'
     
     const POOMSAE_DATA = [
     // Perusliikkeet (Gi Chu) - Keltainen teema
@@ -193,6 +194,12 @@
                     >
                     Historia
                 </button>
+                <button 
+                    @click="activeTab = 'development'"
+                    :class="['flex-1 py-2.5 rounded-lg transition-all', activeTab === 'development' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700']"
+                    >
+                    Kehittyminen
+                </button>
             </div>
     
             <div v-if="activeTab === 'scoring'" class="space-y-4 animate-fade-in">
@@ -297,6 +304,10 @@
                 </div>
             </div>
             
+            <div v-else-if="activeTab === 'development'" class="animate-fade-in">
+                <DevelopmentChart :history="history" />
+            </div>
+
             <div v-else class="space-y-4 animate-fade-in">
                 <div v-if="history.length === 0" class="text-center py-10 text-slate-400">
                     <History :size="48" class="mx-auto mb-2 opacity-20" />
