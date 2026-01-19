@@ -14,7 +14,7 @@ Moderni ja helppokäyttöinen PWA-sovellus (Progressive Web App) Taekwondo Pooms
 
 - **Virallinen pisteytys:** Accuracy (4.0) ja Presentation (6.0) lähtöpisteet.
 - **Isot painikkeet:** Helppo käyttää katsomatta näyttöön (-0.1 ja -0.3 vähennykset).
-- **Presentaation pisteytys:** Helppo arvioida presentaatio suorituksen jälkeen virallisten osapisteiden mukaan (Speed & Power, Rhyth & Tempo, Expression of Energy)
+- **Presentaation pisteytys:** Helppo arvioida presentaatio suorituksen jälkeen virallisten osapisteiden mukaan (Speed & Power, Rhythm & Tempo, Expression of Energy)
 - **Älykäs kumoaminen (Undo):** Mahdollisuus perua viimeisin vähennys virhepainalluksen sattuessa.
 - **Liikesarjojen tuki:** Valitse suoritettava liikesarja (Gi Chu, Taegeuk 1-8, Mustien vöiden sarjat).
 - **Historia:** Tallentaa suoritukset laitteen muistiin (LocalStorage).
