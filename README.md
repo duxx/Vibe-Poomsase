@@ -71,6 +71,12 @@ git clone https://github.com/duxx/Vibe-Poomsase.git
 npm install
 ```
 
+### Testaus
+```bash
+# käyttää vitestia
+npm run test
+```
+
 ### Dev (kehitysversio)
 ```bash
 # Käynnistä kehityspalvelin
