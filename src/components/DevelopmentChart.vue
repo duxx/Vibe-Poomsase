@@ -94,7 +94,7 @@
 </script>
 
 <template>
-    <div class="space-y-6">
+    <div class="space-y-6 animate-fade-in">
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
             
             <!-- Filters -->
