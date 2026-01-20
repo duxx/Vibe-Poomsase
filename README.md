@@ -57,17 +57,28 @@ Sovellus toimii suoraan selaimessa, mutta parhaan käyttökokemuksen saat asenta
 
 ## 💻 Kehitys ja asennus (Developers)
 
-Tämä projekti käyttää Vue 3:a ja Tailwind CSS:ää ilman raskaita komponenttikirjastoja.
+Tämä projekti käyttää Vue 3:a ja Tailwind CSS:ää ilman raskaita komponenttikirjastoja. Voit suorittaa sovelluksen paikallisesti joko Dockerilla tai asentamalla Node.js:n ja npm:n. Molemmat tavat on kuvattu alla.
 
 ### Esivaatimukset
 - Node.js asennettuna
+- Tai Docker asennettuna
 
-### Asennus
 ```bash
-# 1. Kloonaa repo
+# Kloonaa repo
 git clone https://github.com/duxx/Vibe-Poomsase.git
+```
 
-# 2. Asenna riippuvuudet
+### Asennus Docker kontissa
+```bash
+# 1. Käynnistä kontti
+docker compose up --build
+
+# 2. Avaa selain osoitteessa http://localhost:8080
+```
+
+### Asennus paikallisesti
+```bash
+# Asenna riippuvuudet
 npm install
 ```
 
